@@ -19,7 +19,6 @@ const byte spiPinSS = rfidPinSDA;
 
 BLEServer* bleServer = nullptr;
 BLECharacteristic* bleCharacteristic = nullptr;
-uint32_t value = 0;
 
 class ServerCallbacks: public BLEServerCallbacks
 {
@@ -94,23 +93,22 @@ void loop()
       
       for (int i = 0; i < rfid.uid.size; i++)
       {
-        Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+        Serial.print(rfid.uid.uidByte[i] <= 0xF ? " 0" : " ");
         Serial.print(rfid.uid.uidByte[i], HEX);
       }
 
       Serial.println();
 
+      // BLE Notify
+      if (bleServer->getConnectedCount() > 0)
+      {
+        bleCharacteristic->setValue((uint8_t*)rfid.uid.uidByte, rfid.uid.size);
+        bleCharacteristic->notify();
+        Serial.println("BLE Notify");
+      }
+
       rfid.PICC_HaltA();
       rfid.PCD_StopCrypto1();
     }
-  }
-
-  if (bleServer->getConnectedCount() > 0)
-  {
-    bleCharacteristic->setValue((uint8_t*)&value, sizeof(value));
-    bleCharacteristic->notify();
-    Serial.println(value);
-    value++;
-    delay(100);
   }
 }
