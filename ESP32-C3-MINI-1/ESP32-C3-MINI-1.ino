@@ -9,13 +9,13 @@
 const char* uuidService = "5f804f25-4bd9-457a-ac2d-ba39563d9b66";
 const char* uuidCharacteristic = "bbe3aeba-fe89-464f-9a3b-b845b758b239";
 
-const byte rfidPinSDA = 5;
+const int rfidCount = 2;
+const byte rfidPinsSDA[rfidCount] = { 4, 5 };
 const byte rfidPinRST = 9;
 
 const byte spiPinSCK = 6;
 const byte spiPinMISO = 2;
 const byte spiPinMOSI = 7;
-const byte spiPinSS = rfidPinSDA;
 
 BLEServer* bleServer = nullptr;
 BLECharacteristic* bleCharacteristic = nullptr;
@@ -40,15 +40,22 @@ class ServerCallbacks: public BLEServerCallbacks
 BLE2902 ble2902;
 ServerCallbacks serverCallbacks;
 
-MFRC522 rfid(rfidPinSDA, rfidPinRST);
+MFRC522 rfids[rfidCount];
 
 void setup()
 {
   Serial.begin(115200);
 
   // RFID-RC522
-  SPI.begin(spiPinSCK, spiPinMISO, spiPinMOSI, spiPinSS);
-  rfid.PCD_Init();
+  SPI.begin(spiPinSCK, spiPinMISO, spiPinMOSI, -1);
+
+  for (int rfidIndex = 0; rfidIndex < rfidCount; rfidIndex++)
+  {
+    rfids[rfidIndex].PCD_Init(rfidPinsSDA[rfidIndex], rfidPinRST);
+  }
+
+  pinMode(rfidPinRST, OUTPUT);
+  digitalWrite(rfidPinRST, LOW);
 
   BLEDevice::init("ESP32-C3-MINI-1");
 
@@ -78,37 +85,45 @@ void setup()
 
 void loop()
 {
-  if (rfid.PICC_IsNewCardPresent())
+  for (int rfidIndex = 0; rfidIndex < rfidCount; rfidIndex++)
   {
-    Serial.println("New card present");
+    digitalWrite(rfidPinRST, HIGH);
+    rfids[rfidIndex].PCD_Init();
 
-    if (rfid.PICC_ReadCardSerial())
+    if (rfids[rfidIndex].PICC_IsNewCardPresent())
     {
-      MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
-      Serial.print("RFID/NFC Tag Type: ");
-      Serial.println(rfid.PICC_GetTypeName(piccType));
+      Serial.println("New card present");
 
-      // print UID in Serial Monitor in the hex format
-      Serial.print("UID:");
-      
-      for (int i = 0; i < rfid.uid.size; i++)
+      if (rfids[rfidIndex].PICC_ReadCardSerial())
       {
-        Serial.print(rfid.uid.uidByte[i] <= 0xF ? " 0" : " ");
-        Serial.print(rfid.uid.uidByte[i], HEX);
+        MFRC522::PICC_Type piccType = rfids[rfidIndex].PICC_GetType(rfids[rfidIndex].uid.sak);
+        Serial.print("RFID/NFC Tag Type: ");
+        Serial.println(rfids[rfidIndex].PICC_GetTypeName(piccType));
+
+        // print UID in Serial Monitor in the hex format
+        Serial.print("UID:");
+        
+        for (int i = 0; i < rfids[rfidIndex].uid.size; i++)
+        {
+          Serial.print(rfids[rfidIndex].uid.uidByte[i] <= 0xF ? " 0" : " ");
+          Serial.print(rfids[rfidIndex].uid.uidByte[i], HEX);
+        }
+
+        Serial.println();
+
+        // BLE Notify
+        if (bleServer->getConnectedCount() > 0)
+        {
+          bleCharacteristic->setValue((uint8_t*)rfids[rfidIndex].uid.uidByte, rfids[rfidIndex].uid.size);
+          bleCharacteristic->notify();
+          Serial.println("BLE Notify");
+        }
+
+        rfids[rfidIndex].PICC_HaltA();
+        rfids[rfidIndex].PCD_StopCrypto1();
       }
-
-      Serial.println();
-
-      // BLE Notify
-      if (bleServer->getConnectedCount() > 0)
-      {
-        bleCharacteristic->setValue((uint8_t*)rfid.uid.uidByte, rfid.uid.size);
-        bleCharacteristic->notify();
-        Serial.println("BLE Notify");
-      }
-
-      rfid.PICC_HaltA();
-      rfid.PCD_StopCrypto1();
     }
+
+    digitalWrite(rfidPinRST, LOW);
   }
 }
