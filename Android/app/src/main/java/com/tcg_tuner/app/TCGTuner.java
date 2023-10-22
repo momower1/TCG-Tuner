@@ -14,10 +14,12 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -91,7 +93,31 @@ public class TCGTuner extends Activity {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "onCharacteristicChanged", Toast.LENGTH_LONG).show(); });
+            final byte[] data = characteristic.getValue();
+            final StringBuilder stringBuilder = new StringBuilder(data.length);
+
+            for (byte byteChar : data) {
+                stringBuilder.append(String.format("%02X", byteChar));
+            }
+
+            String filepathSound = getExternalFilesDir(null).getAbsolutePath();
+            filepathSound += "/" + stringBuilder.toString() + ".wav";
+
+            MediaPlayer mediaPlayer;
+
+            // Either play tag specific sound if it exists or fallback to default sound
+            if (new File(filepathSound).exists()) {
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(filepathSound));
+            } else {
+                filepathSound += " (MISSING)";
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.play);
+            }
+
+            mediaPlayer.setOnCompletionListener((MediaPlayer m) -> {m.release(); });
+            mediaPlayer.start();
+
+            final String message = stringBuilder.toString() + "\n" + filepathSound;
+            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show(); });
         }
     };
 
