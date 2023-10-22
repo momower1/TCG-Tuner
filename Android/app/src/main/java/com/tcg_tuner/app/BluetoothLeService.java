@@ -13,12 +13,13 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.File;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -100,20 +101,35 @@ public class BluetoothLeService extends Service {
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        Log.d(TAG, "Received some characteristic!");
-        // For all other profiles, writes the data formatted in HEX.
         final byte[] data = characteristic.getValue();
+        final StringBuilder stringBuilder = new StringBuilder(data.length);
+
         if (data != null && data.length > 0) {
-            final StringBuilder stringBuilder = new StringBuilder(data.length);
-            for (byte byteChar : data)
-                stringBuilder.append(String.format("%02X ", byteChar));
-            intent.putExtra(EXTRA_DATA, stringBuilder.toString());
+            for (byte byteChar : data) {
+                stringBuilder.append(String.format("%02X", byteChar));
+            }
             Log.d(TAG, stringBuilder.toString());
         }
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.play);
+        String filepathSound = getExternalFilesDir(null).getAbsolutePath();
+        filepathSound += "/" + stringBuilder.toString() + ".wav";
+
+        Log.d(TAG, filepathSound);
+
+        MediaPlayer mediaPlayer;
+
+        // Either play tag specific sound if it exists or fallback to default sound
+        if (new File(filepathSound).exists()) {
+            mediaPlayer = MediaPlayer.create(this, Uri.parse(filepathSound));
+        } else {
+            filepathSound += " (MISSING)";
+            mediaPlayer = MediaPlayer.create(this, R.raw.play);
+        }
+
         mediaPlayer.setOnCompletionListener(this::mediaPlayerOnCompletionListener);
         mediaPlayer.start();
+
+        intent.putExtra(EXTRA_DATA, stringBuilder.toString() + "\n" + filepathSound);
 
         sendBroadcast(intent);
     }
