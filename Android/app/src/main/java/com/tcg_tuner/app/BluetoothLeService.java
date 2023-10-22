@@ -127,6 +127,7 @@ public class BluetoothLeService extends Service {
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
         } else {
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.play);
+            mediaPlayer.setOnCompletionListener(this::mediaPlayerOnCompletionListener);
             mediaPlayer.start();
             Log.d(TAG, "Received some characteristic!");
             // For all other profiles, writes the data formatted in HEX.
@@ -140,6 +141,10 @@ public class BluetoothLeService extends Service {
             }
         }
         sendBroadcast(intent);
+    }
+
+    private void mediaPlayerOnCompletionListener(MediaPlayer mediaPlayer) {
+        mediaPlayer.release();
     }
 
     public class LocalBinder extends Binder {
