@@ -1,12 +1,13 @@
 package com.tcg_tuner.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 public class TCGTuner extends Activity {
@@ -16,6 +17,17 @@ public class TCGTuner extends Activity {
     private final String esp32CharacteristicDefault = "bbe3aeba-fe89-464f-9a3b-b845b758b239";
 
     SharedPreferences sharedPreferences;
+
+    BluetoothAdapter bluetoothAdapter;
+
+    private void ShowMessage(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setNeutralButton("OK", null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +47,19 @@ public class TCGTuner extends Activity {
 
         // Determine whether BLE is supported on the device
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "ERROR: BLE not supported by this device! Exiting...", Toast.LENGTH_LONG).show();
-            finish();
-        }
-
-        /*
-        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
-        // BluetoothAdapter through BluetoothManager.
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
+            ShowMessage("ERROR", "BLE not supported by this device!");
             return;
         }
-*/
-        Log.d("TCGTuner", "onCreate");
+
+        // Initialize Bluetooth
+        final BluetoothManager bluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
+
+        if (bluetoothAdapter == null) {
+            ShowMessage("ERROR", "Failed to get BluetoothAdapter!");
+            return;
+        }
+
+        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
     }
 }
