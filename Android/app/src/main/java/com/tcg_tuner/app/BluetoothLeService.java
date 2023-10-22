@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -125,6 +126,8 @@ public class BluetoothLeService extends Service {
             Log.d(TAG, String.format("Received heart rate: %d", heartRate));
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
         } else {
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.play);
+            mediaPlayer.start();
             Log.d(TAG, "Received some characteristic!");
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();
