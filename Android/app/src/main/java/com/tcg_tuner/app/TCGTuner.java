@@ -50,45 +50,63 @@ public class TCGTuner extends Activity {
     protected final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "onConnectionStateChange", Toast.LENGTH_LONG).show(); });
-
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                gatt.discoverServices();
+            switch (newState) {
+                case BluetoothProfile.STATE_CONNECTING: {
+                    runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Connecting", Toast.LENGTH_SHORT).show(); });
+                    break;
+                }
+                case BluetoothProfile.STATE_CONNECTED: {
+                    runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show(); });
+                    gatt.discoverServices();
+                    break;
+                }
+                case BluetoothProfile.STATE_DISCONNECTING: {
+                    runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Disconnecting", Toast.LENGTH_SHORT).show(); });
+                    break;
+                }
+                case BluetoothProfile.STATE_DISCONNECTED: {
+                    runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show(); });
+                    runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Reconnecting", Toast.LENGTH_SHORT).show(); });
+                    gatt.connect();
+                    break;
+                }
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "onServicesDiscovered", Toast.LENGTH_LONG).show(); });
+            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Service Discovered", Toast.LENGTH_SHORT).show(); });
 
             bluetoothGattService = gatt.getService(UUID.fromString(esp32Service));
 
             if (bluetoothGattService == null) {
-                runOnUiThread(() -> { ShowMessage("ERROR", "Failed to get BluetoothGattService!"); });
+                runOnUiThread(() -> { ShowMessage("ERROR", "Failed to get BluetoothGattService!\n\nUUID:\n" + esp32Service); });
                 return;
             }
 
             bluetoothGattCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(esp32Characteristic));
 
             if (bluetoothGattCharacteristic == null) {
-                runOnUiThread(() -> { ShowMessage("ERROR", "Failed to get BluetoothGattCharacteristic!"); });
+                runOnUiThread(() -> { ShowMessage("ERROR", "Failed to get BluetoothGattCharacteristic!\n\nUUID:\n" + esp32Characteristic); });
                 return;
             }
 
-            bluetoothGatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
+            gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
 
             List<BluetoothGattDescriptor> bluetoothGattDescriptors = bluetoothGattCharacteristic.getDescriptors();
 
             for (BluetoothGattDescriptor bluetoothGattDescriptor : bluetoothGattDescriptors)
             {
                 bluetoothGattDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                bluetoothGatt.writeDescriptor(bluetoothGattDescriptor);
+                gatt.writeDescriptor(bluetoothGattDescriptor);
             }
+
+            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Enabled Notifications", Toast.LENGTH_SHORT).show(); });
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "onCharacteristicRead", Toast.LENGTH_LONG).show(); });
+            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), "Read", Toast.LENGTH_SHORT).show(); });
         }
 
         @Override
@@ -124,6 +142,19 @@ public class TCGTuner extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Request all the app permissions at startup
+        // Functions that require permissions throw exceptions when denied
+        final String[] permissionRequests = { "android.permission.BLUETOOTH_CONNECT" };
+        requestPermissions(permissionRequests, 0);
+
+        // Inform the user in case a permission is required
+        for (String permission : permissionRequests) {
+            if (checkSelfPermission(permission) == PackageManager.PERMISSION_DENIED) {
+                ShowMessage("PERMISSION DENIED", permission.substring(19) + " needs to be permitted for this app to work correctly!\n\nPlease go to the app settings and grant the permission.");
+                return;
+            }
+        }
 
         // Load saved application preferences
         sharedPreferences = getSharedPreferences("TCG-Tuner", MODE_PRIVATE);
@@ -171,5 +202,7 @@ public class TCGTuner extends Activity {
             ShowMessage("ERROR", "Failed to connect BluetoothGatt!");
             return;
         }
+
+        Toast.makeText(getApplicationContext(), "Starting", Toast.LENGTH_SHORT).show();
     }
 }
