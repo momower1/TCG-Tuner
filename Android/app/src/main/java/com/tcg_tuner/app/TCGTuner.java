@@ -25,6 +25,7 @@ import java.util.UUID;
 
 public class TCGTuner extends Activity {
 
+    private final String[] permissionRequests = { "android.permission.BLUETOOTH_CONNECT" };
     private String esp32Address = "EC:DA:3B:AB:08:BE";
     private String esp32Service = "5f804f25-4bd9-457a-ac2d-ba39563d9b66";
     private String esp32Characteristic = "bbe3aeba-fe89-464f-9a3b-b845b758b239";
@@ -140,14 +141,21 @@ public class TCGTuner extends Activity {
     };
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Start();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
 
         // Request all the app permissions at startup
         // Functions that require permissions throw exceptions when denied
-        final String[] permissionRequests = { "android.permission.BLUETOOTH_CONNECT" };
         requestPermissions(permissionRequests, 0);
+    }
 
+    private void Start() {
         // Inform the user in case a permission is required
         for (String permission : permissionRequests) {
             if (checkSelfPermission(permission) == PackageManager.PERMISSION_DENIED) {
