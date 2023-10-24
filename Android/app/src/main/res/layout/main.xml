@@ -73,12 +73,37 @@
                 android:ems="10"
                 android:inputType="text" />
 
+            <TextView
+                android:id="@+id/storageDirectory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Storage Directory" />
+
+            <EditText
+                android:id="@+id/storageDirectoryEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:inputType="text" />
+
             <Button
                 android:id="@+id/buttonSave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Save" />
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tagID"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="ID"
+            android:textAlignment="center"
+            android:textSize="50sp" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

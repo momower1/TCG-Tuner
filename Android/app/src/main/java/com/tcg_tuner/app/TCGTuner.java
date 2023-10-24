@@ -121,24 +121,26 @@ public class TCGTuner extends Activity {
                 stringBuilder.append(String.format("%02X", byteChar));
             }
 
+            String tagID = stringBuilder.toString();
+
             String filepathSound = getExternalFilesDir(null).getAbsolutePath();
-            filepathSound += "/" + stringBuilder.toString() + ".wav";
+            filepathSound += "/" + tagID + ".wav";
 
             MediaPlayer mediaPlayer;
 
             // Either play tag specific sound if it exists or fallback to default sound
             if (new File(filepathSound).exists()) {
+                ((TextView)findViewById(R.id.tagID)).setText(tagID);
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(filepathSound));
             } else {
-                filepathSound += " (MISSING)";
+                ((TextView)findViewById(R.id.tagID)).setText(tagID + "\n(MISSING)");
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.play);
             }
 
             mediaPlayer.setOnCompletionListener((MediaPlayer m) -> {m.release(); });
             mediaPlayer.start();
 
-            final String message = stringBuilder.toString() + "\n" + filepathSound;
-            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show(); });
+            runOnUiThread(() -> { Toast.makeText(getApplicationContext(), tagID, Toast.LENGTH_SHORT).show(); });
         }
     };
 
@@ -176,6 +178,7 @@ public class TCGTuner extends Activity {
         ((TextView)findViewById(R.id.esp32AddressEdit)).setText(esp32Address);
         ((TextView)findViewById(R.id.esp32ServiceEdit)).setText(esp32Service);
         ((TextView)findViewById(R.id.esp32CharacteristicEdit)).setText(esp32Characteristic);
+        ((TextView)findViewById(R.id.storageDirectoryEdit)).setText(getExternalFilesDir(null).getAbsolutePath() + "/");
 
         // Save preferences on UI button click
         findViewById(R.id.buttonSave).setOnClickListener(view -> {
