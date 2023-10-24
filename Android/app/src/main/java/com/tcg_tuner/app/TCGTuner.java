@@ -193,8 +193,10 @@ public class TCGTuner extends Activity {
 
             if (linearLayoutInner.getVisibility() == View.VISIBLE) {
                 linearLayoutInner.setVisibility(View.GONE);
+                findViewById(R.id.tagID).setVisibility(View.VISIBLE);
             } else {
                 linearLayoutInner.setVisibility(View.VISIBLE);
+                findViewById(R.id.tagID).setVisibility(View.GONE);
             }
         });
 
