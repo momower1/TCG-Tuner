@@ -5,105 +5,116 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/linearLayoutOuter"
+    <TextView
+        android:id="@+id/tagID"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:gravity="center_horizontal|center_vertical"
+        android:text="ID"
+        android:textAlignment="center"
+        android:textSize="50sp"
+        tools:layout_editor_absoluteY="101dp" />
 
-        <Button
-            android:id="@+id/buttonPreferences"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="right|top"
-            android:layout_margin="20dp"
-            android:foreground="@android:drawable/ic_menu_preferences"
-            android:visibility="visible"
-            app:icon="@android:drawable/ic_menu_preferences" />
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/linearLayoutInner"
+            android:id="@+id/linearLayoutOuter"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="32dp"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/esp32Address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ESP32 Address" />
-
-            <EditText
-                android:id="@+id/esp32AddressEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:ems="10"
-                android:inputType="text" />
-
-            <TextView
-                android:id="@+id/esp32Service"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ESP32 Service UUID" />
-
-            <EditText
-                android:id="@+id/esp32ServiceEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:ems="10"
-                android:inputType="text" />
-
-            <TextView
-                android:id="@+id/esp32Characteristic"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ESP32 Characteristic UUID" />
-
-            <EditText
-                android:id="@+id/esp32CharacteristicEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="text" />
-
-            <TextView
-                android:id="@+id/storageDirectory"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Storage Directory" />
-
-            <EditText
-                android:id="@+id/storageDirectoryEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:enabled="false"
-                android:inputType="text" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <Button
-                android:id="@+id/buttonSave"
+                android:id="@+id/buttonPreferences"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="right|top"
+                android:layout_margin="20dp"
+                android:foreground="@android:drawable/ic_menu_preferences"
+                android:visibility="visible"
+                app:icon="@android:drawable/ic_menu_preferences" />
+
+            <LinearLayout
+                android:id="@+id/linearLayoutInner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Save" />
+                android:layout_height="match_parent"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/esp32Address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ESP32 Address" />
+
+                <EditText
+                    android:id="@+id/esp32AddressEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:ems="10"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/esp32Service"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ESP32 Service UUID" />
+
+                <EditText
+                    android:id="@+id/esp32ServiceEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:ems="10"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/esp32Characteristic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ESP32 Characteristic UUID" />
+
+                <EditText
+                    android:id="@+id/esp32CharacteristicEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/storageDirectory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Storage Directory" />
+
+                <EditText
+                    android:id="@+id/storageDirectoryEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="text" />
+
+                <Button
+                    android:id="@+id/buttonSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Save" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tagID"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="ID"
-            android:textAlignment="center"
-            android:textSize="50sp" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
