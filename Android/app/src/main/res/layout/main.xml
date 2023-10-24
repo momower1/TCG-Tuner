@@ -29,7 +29,8 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="32dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/esp32Address"
@@ -71,6 +72,12 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="text" />
+
+            <Button
+                android:id="@+id/buttonSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save" />
         </LinearLayout>
     </LinearLayout>
 

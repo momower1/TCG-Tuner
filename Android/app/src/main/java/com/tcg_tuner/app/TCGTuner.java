@@ -17,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -166,15 +168,32 @@ public class TCGTuner extends Activity {
 
         // Load saved application preferences
         sharedPreferences = getSharedPreferences("TCG-Tuner", MODE_PRIVATE);
-
         esp32Address = sharedPreferences.getString("esp32Address", esp32Address);
         esp32Service = sharedPreferences.getString("esp32Service", esp32Service);
         esp32Characteristic = sharedPreferences.getString("esp32Characteristic", esp32Characteristic);
 
-        // TODO: Add UI elements to edit these strings and update preferences like here
-        sharedPreferences.edit().putString("esp32Address", esp32Address).commit();
-        sharedPreferences.edit().putString("esp32Service", esp32Service).commit();
-        sharedPreferences.edit().putString("esp32Characteristic", esp32Characteristic).commit();
+        // Update UI preferences elements
+        ((TextView)findViewById(R.id.esp32AddressEdit)).setText(esp32Address);
+        ((TextView)findViewById(R.id.esp32ServiceEdit)).setText(esp32Service);
+        ((TextView)findViewById(R.id.esp32CharacteristicEdit)).setText(esp32Characteristic);
+
+        // Save preferences on UI button click
+        findViewById(R.id.buttonSave).setOnClickListener(view -> {
+            sharedPreferences.edit().putString("esp32Address", String.valueOf(((TextView)findViewById(R.id.esp32AddressEdit)).getText())).commit();
+            sharedPreferences.edit().putString("esp32Service", String.valueOf(((TextView)findViewById(R.id.esp32ServiceEdit)).getText())).commit();
+            sharedPreferences.edit().putString("esp32Characteristic", String.valueOf(((TextView)findViewById(R.id.esp32CharacteristicEdit)).getText())).commit();
+        });
+
+        // Set all the UI callbacks
+        findViewById(R.id.buttonPreferences).setOnClickListener(view -> {
+            View linearLayoutInner = findViewById(R.id.linearLayoutInner);
+
+            if (linearLayoutInner.getVisibility() == View.VISIBLE) {
+                linearLayoutInner.setVisibility(View.GONE);
+            } else {
+                linearLayoutInner.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Determine whether BLE is supported on the device
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -197,7 +216,11 @@ public class TCGTuner extends Activity {
             return;
         }
 
-        bluetoothDevice = bluetoothAdapter.getRemoteDevice(esp32Address);
+        try {
+            bluetoothDevice = bluetoothAdapter.getRemoteDevice(esp32Address);
+        } catch (Exception e) {
+            ShowMessage("ERROR", e.getMessage());
+        }
 
         if (bluetoothDevice == null) {
             ShowMessage("ERROR", "Failed to get remote BluetoothDevice!");
