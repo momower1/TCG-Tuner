@@ -178,7 +178,7 @@ public class TCGTuner extends Activity {
         ((TextView)findViewById(R.id.esp32AddressEdit)).setText(esp32Address);
         ((TextView)findViewById(R.id.esp32ServiceEdit)).setText(esp32Service);
         ((TextView)findViewById(R.id.esp32CharacteristicEdit)).setText(esp32Characteristic);
-        ((TextView)findViewById(R.id.storageDirectoryEdit)).setText(getExternalFilesDir(null).getAbsolutePath() + "/");
+        ((TextView)findViewById(R.id.storageDirectoryText)).setText(getExternalFilesDir(null).getAbsolutePath() + "/");
 
         // Save preferences on UI button click
         findViewById(R.id.buttonSave).setOnClickListener(view -> {

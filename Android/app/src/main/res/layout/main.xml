@@ -61,7 +61,7 @@
                     android:id="@+id/esp32AddressEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="20dp"
                     android:ems="10"
                     android:inputType="text" />
 
@@ -75,7 +75,7 @@
                     android:id="@+id/esp32ServiceEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="20dp"
                     android:ems="10"
                     android:inputType="text" />
 
@@ -89,6 +89,7 @@
                     android:id="@+id/esp32CharacteristicEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
                     android:ems="10"
                     android:inputType="text" />
 
@@ -98,13 +99,15 @@
                     android:layout_height="wrap_content"
                     android:text="Storage Directory" />
 
-                <EditText
-                    android:id="@+id/storageDirectoryEdit"
+                <TextView
+                    android:id="@+id/storageDirectoryText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
                     android:ems="10"
-                    android:enabled="false"
-                    android:inputType="text" />
+                    android:enabled="true"
+                    android:inputType="text"
+                    android:scrollHorizontally="true" />
 
                 <Button
                     android:id="@+id/buttonSave"
