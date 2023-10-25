@@ -21,7 +21,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +34,8 @@ public class TCGTuner extends Activity {
     private String esp32Address = "EC:DA:3B:AB:08:BE";
     private String esp32Service = "5f804f25-4bd9-457a-ac2d-ba39563d9b66";
     private String esp32Characteristic = "bbe3aeba-fe89-464f-9a3b-b845b758b239";
+
+    private HashMap<String, String> rfidMap = new HashMap<String, String>();
 
     SharedPreferences sharedPreferences;
 
@@ -121,22 +126,29 @@ public class TCGTuner extends Activity {
                 stringBuilder.append(String.format("%02X", byteChar));
             }
 
-            String tagID = stringBuilder.toString();
-
-            String filepathSound = getExternalFilesDir(null).getAbsolutePath();
-            filepathSound += "/" + tagID + ".wav";
-
             MediaPlayer mediaPlayer;
+            String tagID = stringBuilder.toString().replaceAll("\\s", "");
+            String displayText = tagID;
 
-            // Either play tag specific sound if it exists or fallback to default sound
-            if (new File(filepathSound).exists()) {
-                ((TextView)findViewById(R.id.tagID)).setText(tagID);
-                mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(filepathSound));
+            // Load the sound that is referenced by RFID.txt if possible, otherwise load a default resource sound
+            if (rfidMap.containsKey(tagID)) {
+                String filepathSound = getExternalFilesDir(null).getAbsolutePath() + "/" + rfidMap.get(tagID);
+                displayText += "\n↓\n" + rfidMap.get(tagID);
+
+                if (new File(filepathSound).exists()) {
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(filepathSound));
+                } else {
+                    displayText += "\n(MISSING)";
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.play);
+                }
             } else {
-                ((TextView)findViewById(R.id.tagID)).setText(tagID + "\n(MISSING)");
+                displayText += "\n(MISSING)";
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.play);
             }
 
+            ((TextView)findViewById(R.id.tagID)).setText(displayText);
+
+            // Play the sound and release the player when finished
             mediaPlayer.setOnCompletionListener((MediaPlayer m) -> {m.release(); });
             mediaPlayer.start();
 
@@ -199,6 +211,24 @@ public class TCGTuner extends Activity {
                 findViewById(R.id.tagID).setVisibility(View.GONE);
             }
         });
+
+        // Parse the RFID.txt file from the storage directory into a map
+        // Each line in the file maps an ID to a sound filename e.g.
+        // D368B20D -> OP02-01.wav
+        try {
+            FileReader rfidFileReader = new FileReader(getExternalFilesDir(null).getAbsolutePath() + "/RFID.txt");
+            BufferedReader rfidBufferedReader = new BufferedReader(rfidFileReader);
+            String rfidLine;
+
+            while((rfidLine = rfidBufferedReader.readLine()) != null) {
+                String[] splits = rfidLine.split("->", 2);
+                String tagID = splits[0].replaceAll("\\s", "");
+                String filenameSound = splits[1].trim();
+                rfidMap.put(tagID, filenameSound);
+            }
+        } catch (Exception e) {
+            ShowMessage("ERROR", "Failed parsing \"" + getExternalFilesDir(null).getAbsolutePath() + "/RFID.txt\"\n\nMake sure to place an RFID.txt file into the storage directory that contains mappings from tag ID to sound filename separated by \"->\" in each line. TCG-Tuner will then play the sound file that is referenced by the ID. Make sure to also place all audio files in the storage directory.\n\nExample RFID.txt content:\nD368B20D -> OP02-01.wav\n8320DC0F -> OP03-17.wav");
+        }
 
         // Determine whether BLE is supported on the device
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
