@@ -107,7 +107,10 @@
                     android:ems="10"
                     android:enabled="true"
                     android:inputType="text"
-                    android:scrollHorizontally="true" />
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
+                    android:scrollbars="horizontal"
+                    android:scrollHorizontally="false"
+                    android:textSize="18sp" />
 
                 <Button
                     android:id="@+id/buttonSave"

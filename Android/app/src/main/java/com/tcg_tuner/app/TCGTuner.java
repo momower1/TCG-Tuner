@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -191,6 +192,7 @@ public class TCGTuner extends Activity {
         ((TextView)findViewById(R.id.esp32ServiceEdit)).setText(esp32Service);
         ((TextView)findViewById(R.id.esp32CharacteristicEdit)).setText(esp32Characteristic);
         ((TextView)findViewById(R.id.storageDirectoryText)).setText(getExternalFilesDir(null).getAbsolutePath() + "/");
+        ((TextView)findViewById(R.id.storageDirectoryText)).setMovementMethod(new ScrollingMovementMethod());
 
         // Save preferences on UI button click
         findViewById(R.id.buttonSave).setOnClickListener(view -> {
