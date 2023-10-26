@@ -147,7 +147,8 @@ public class TCGTuner extends Activity {
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.play);
             }
 
-            ((TextView)findViewById(R.id.tagID)).setText(displayText);
+            final String displayTextUI = displayText;
+            runOnUiThread(() -> {((TextView)findViewById(R.id.tagID)).setText(displayTextUI); });
 
             // Play the sound and release the player when finished
             mediaPlayer.setOnCompletionListener((MediaPlayer m) -> {m.release(); });
