@@ -20,15 +20,32 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/buttonPreferences"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="right|top"
-                android:layout_margin="20dp"
-                android:foreground="@android:drawable/ic_menu_preferences"
-                android:visibility="visible"
-                app:icon="@android:drawable/ic_menu_preferences" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/buttonInfo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="top|left"
+                    android:layout_margin="20dp"
+                    android:foreground="@android:drawable/ic_menu_info_details"
+                    android:layoutDirection="locale"
+                    android:visibility="visible"
+                    app:icon="@android:drawable/ic_menu_info_details" />
+
+                <Button
+                    android:id="@+id/buttonPreferences"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="right|top"
+                    android:layout_margin="20dp"
+                    android:foreground="@android:drawable/ic_menu_preferences"
+                    android:layoutDirection="inherit"
+                    android:visibility="visible"
+                    app:icon="@android:drawable/ic_menu_preferences" />
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayoutInner"

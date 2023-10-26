@@ -203,6 +203,10 @@ public class TCGTuner extends Activity {
         });
 
         // Set all the UI callbacks
+        findViewById(R.id.buttonInfo).setOnClickListener(view -> {
+            ShowMessage("Information", "TCG-Tuner connects to a Bluetooth Low Energy (BLE) device on which a service notifies TCG-Tuner about scanned RFID tag IDs and plays a corresponding sound from the app storage directory. The BLE connection requires the device address, service UUID and characteristic UUID to be configured correctly in the preferences menu. Then, when a tag ID is received, TCG-Tuner will look for the \"RFID.txt\" file in the app storage directory. This file contains mappings from tag ID to sound filename separated by \"->\" in each line. TCG-Tuner will then play the sound file that is referenced by the ID. Make sure to also place all audio files in the storage directory. The storage directory path can be obtained from the preferences menu.\n\nExample RFID.txt content:\nD368B20D -> OP02-01.wav\n8320DC0F -> OP03-17.wav");
+        });
+
         findViewById(R.id.buttonPreferences).setOnClickListener(view -> {
             View linearLayoutInner = findViewById(R.id.linearLayoutInner);
 
