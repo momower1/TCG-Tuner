@@ -278,4 +278,11 @@ public class TCGTuner extends Activity {
 
         Toast.makeText(getApplicationContext(), "Starting", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        bluetoothGatt.close();
+    }
 }
