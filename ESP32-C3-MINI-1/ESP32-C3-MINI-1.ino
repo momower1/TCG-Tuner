@@ -90,6 +90,9 @@ void loop()
     digitalWrite(rfidPinRST, HIGH);
     rfids[rfidIndex].PCD_Init();
 
+    // Waiting a bit is necessary to reliably detect Mifare Ultralight tags
+    delay(1);
+
     if (rfids[rfidIndex].PICC_IsNewCardPresent())
     {
       Serial.println("New card present");
