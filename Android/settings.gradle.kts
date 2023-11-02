@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TCG-Tuner"
 include(":app")
+ 
