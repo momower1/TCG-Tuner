@@ -283,6 +283,8 @@ public class TCGTuner extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
-        bluetoothGatt.close();
+        if (bluetoothGatt != null) {
+            bluetoothGatt.close();
+        }
     }
 }
