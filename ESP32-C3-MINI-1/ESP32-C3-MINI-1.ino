@@ -9,9 +9,9 @@
 const char* uuidService = "5f804f25-4bd9-457a-ac2d-ba39563d9b66";
 const char* uuidCharacteristic = "bbe3aeba-fe89-464f-9a3b-b845b758b239";
 
-const int rfidCount = 2;
-const byte rfidPinsSDA[rfidCount] = { 4, 5 };
-const byte rfidPinRST = 9;
+const int rfidCount = 8;
+const byte rfidPinsSDA[rfidCount] = { 0, 1, 3, 4, 5, 9, 18, 19 };
+const byte rfidPinRST = 10;
 
 const byte spiPinSCK = 6;
 const byte spiPinMISO = 2;
@@ -103,7 +103,7 @@ void loop()
         Serial.print("RFID/NFC Tag Type: ");
         Serial.println(rfids[rfidIndex].PICC_GetTypeName(piccType));
 
-        // print UID in Serial Monitor in the hex format
+        // Print UID in hex format
         Serial.print("UID:");
         
         for (int i = 0; i < rfids[rfidIndex].uid.size; i++)
