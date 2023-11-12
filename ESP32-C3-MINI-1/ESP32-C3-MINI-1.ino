@@ -3,6 +3,7 @@
 #include <BLE2902.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include <Dictionary.h>
 
 // https://www.uuidgenerator.net/
 // Choose unique identifiers for the BLE service and characteristic
@@ -13,12 +14,16 @@ const int rfidCount = 8;
 const byte rfidPinsSDA[rfidCount] = { 0, 1, 3, 4, 5, 8, 18, 19 };
 const byte rfidPinRST = 10;
 
-const byte spiPinSCK = 6;
-const byte spiPinMISO = 2;
-const byte spiPinMOSI = 7;
+const byte spiPinSCK = 6;   // FSPICLK
+const byte spiPinMISO = 2;  // FSPIIQ
+const byte spiPinMOSI = 7;  // FSPIID
+
+const int uidTimeout = 3000;
 
 BLEServer* bleServer = nullptr;
 BLECharacteristic* bleCharacteristic = nullptr;
+
+Dictionary* uidToTimeMap = nullptr;
 
 class ServerCallbacks: public BLEServerCallbacks
 {
@@ -81,6 +86,8 @@ void setup()
   BLEDevice::startAdvertising();
 
   Serial.println("Started advertising...");
+
+  uidToTimeMap = new Dictionary();
 }
 
 void loop()
@@ -95,32 +102,37 @@ void loop()
 
     if (rfids[rfidIndex].PICC_IsNewCardPresent())
     {
-      Serial.println("New card present");
-
       if (rfids[rfidIndex].PICC_ReadCardSerial())
       {
-        MFRC522::PICC_Type piccType = rfids[rfidIndex].PICC_GetType(rfids[rfidIndex].uid.sak);
-        Serial.print("RFID/NFC Tag Type: ");
-        Serial.println(rfids[rfidIndex].PICC_GetTypeName(piccType));
+        String uidString = "";
 
-        // Print UID in hex format
-        Serial.print("UID:");
-        
         for (int i = 0; i < rfids[rfidIndex].uid.size; i++)
         {
-          Serial.print(rfids[rfidIndex].uid.uidByte[i] <= 0xF ? " 0" : " ");
-          Serial.print(rfids[rfidIndex].uid.uidByte[i], HEX);
+          if (rfids[rfidIndex].uid.uidByte[i] <= 0xF)
+          {
+            uidString += "0";
+          }
+          
+          uidString += String(rfids[rfidIndex].uid.uidByte[i], HEX);
         }
 
-        Serial.println();
+        uidString.toUpperCase();
 
-        // BLE Notify
-        if (bleServer->getConnectedCount() > 0)
+        // Check if the uid has already been detected recently
+        if (uidToTimeMap->search(uidString).length() == 0)
         {
-          bleCharacteristic->setValue((uint8_t*)rfids[rfidIndex].uid.uidByte, rfids[rfidIndex].uid.size);
-          bleCharacteristic->notify();
-          Serial.println("BLE Notify");
+          // BLE Notify
+          if (bleServer->getConnectedCount() > 0)
+          {
+            bleCharacteristic->setValue((uint8_t*)rfids[rfidIndex].uid.uidByte, rfids[rfidIndex].uid.size);
+            bleCharacteristic->notify();
+            Serial.println("BLE Notify");
+          }
         }
+
+        uidToTimeMap->insert(uidString, String(millis()));
+
+        Serial.println(uidString);
 
         rfids[rfidIndex].PICC_HaltA();
         rfids[rfidIndex].PCD_StopCrypto1();
@@ -128,5 +140,26 @@ void loop()
     }
 
     digitalWrite(rfidPinRST, LOW);
+  }
+
+  // Remove uids that have timed out since they have not been detected recently
+  // Only remove one id at a time since the dictionary indices are recreated after every remove
+  String keyToRemove = "";
+  size_t uidToTimeMapCount = uidToTimeMap->count();
+
+  for (int i = 0; i < uidToTimeMapCount; i++)
+  {
+    unsigned long uidTime = uidToTimeMap->value(i).toInt();
+
+    if ((millis() - uidTime) > uidTimeout)
+    {
+      keyToRemove = uidToTimeMap->key(i);
+      break;
+    }
+  }
+
+  if (keyToRemove.length() > 0)
+  {
+    uidToTimeMap->remove(keyToRemove);
   }
 }
