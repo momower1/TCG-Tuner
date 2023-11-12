@@ -10,7 +10,7 @@ const char* uuidService = "5f804f25-4bd9-457a-ac2d-ba39563d9b66";
 const char* uuidCharacteristic = "bbe3aeba-fe89-464f-9a3b-b845b758b239";
 
 const int rfidCount = 8;
-const byte rfidPinsSDA[rfidCount] = { 0, 1, 3, 4, 5, 9, 18, 19 };
+const byte rfidPinsSDA[rfidCount] = { 0, 1, 3, 4, 5, 8, 18, 19 };
 const byte rfidPinRST = 10;
 
 const byte spiPinSCK = 6;
