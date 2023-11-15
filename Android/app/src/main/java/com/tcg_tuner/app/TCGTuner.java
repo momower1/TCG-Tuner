@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -167,6 +168,11 @@ public class TCGTuner extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        // Android devices go into doze mode after being idle for some time
+        // In doze mode, BLE notifications are not processed instantly, resulting in lag
+        // Avoid going into doze mode by keeping the screen on to ensure instant BLE notifications
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Request all the app permissions at startup
         // Functions that require permissions throw exceptions when denied
